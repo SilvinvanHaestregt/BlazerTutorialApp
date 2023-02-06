@@ -1,0 +1,103 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<h1>Testsite</h1>
+
+@*<ul>
+    @foreach (var employee in Employees)
+    {
+        <li>Name: @employee.Name Age: @employee.Age Id: @employee.Id</li>
+    }
+</ul>*@
+
+@* Table *@
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Age</th>
+            <th>Job title</th>
+            <th>Id</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var employee in Employees)
+        {
+            <tr>
+                <td>@employee.Name</td>
+                <td>@employee.Age</td>
+                <td>@employee.Jobtitle</td>
+                <td>@employee.Id</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@* Form *@
+
+<input class="form-control" style="width:50%;" placeholder="Enter name" @bind="newEmployee" />
+<input class="form-control mt-2" style="width:50%;" placeholder="Enter age" @bind="inputAge"/>
+<select class="form-control mt-2" style="width:50%;" @bind="inputJobtitle">
+    <option value="" disabled selected>Choose an option</option>
+    <option value="Medewerker">Medewerker</option>
+    <option value="CEO">CEO</option>
+</select>
+<button class="btn-primary mt-2" style="width:50%;" @onclick="AddEmployee">Add employee</button>
+
+@* Error message *@
+
+<p hidden="@errorElementHidden" class="alert-danger mt-2">@errorElementValue</p>
+
+@code {
+    private string? newEmployee;
+    private int inputAge;
+    string inputJobtitle = "";
+    private bool errorElementHidden { get; set; } = true;
+    @* Show and hide function for error message *@
+    private void Show(bool hidden)
+    {
+        errorElementHidden = hidden;
+    }
+    private string? errorElementValue;
+
+    private List<Employee> Employees = new();
+
+    public void AddEmployee()
+    {
+        if (!string.IsNullOrWhiteSpace(newEmployee))
+        {
+            if (!inputAge.Equals(0))
+            {
+                if(inputJobtitle != "")
+                {
+                    if (Employees.Count == 0)
+                    {
+                        int id = 1;
+                        Employees.Add(new Employee { Id = id, Name = newEmployee, Age = inputAge, Jobtitle = inputJobtitle });
+                    }
+                    else
+                    {
+                        var firstEmployee = Employees.First();
+                        Employees.Add(new Employee { Id = firstEmployee.Id + 1, Name = newEmployee, Age = inputAge, Jobtitle = inputJobtitle });
+                    }
+                    newEmployee = string.Empty;
+                    inputAge = int.Sign(0);
+                    Show(true);
+                } else{
+                    errorElementValue = "You need to choose an job title for the employee";
+                    Show(false);
+                }
+            } else
+            {
+                errorElementValue = "Enter an age older dan 0!";
+                Show(false);
+            }
+        } else
+        {
+            errorElementValue = "Enter a name!";
+            Show(false);
+        }
+    }
+}
